@@ -92,6 +92,7 @@ class GlassesModel(CycleGANModel):
         errors = CycleGANModel.get_current_errors(self)
         errors['M_A'] = self.loss_mask_A.data[0]
         errors['M_B'] = self.loss_mask_B.data[0]
+        return errors
 
     def get_current_visuals(self):
         visuals = CycleGANModel.get_current_visuals(self)
@@ -99,3 +100,4 @@ class GlassesModel(CycleGANModel):
         visuals['masked_fake_B'] = self.masked_fake_B
         visuals['masked_real_B'] = self.masked_real_B
         visuals['masked_fake_A'] = self.masked_fake_A
+        return visuals
