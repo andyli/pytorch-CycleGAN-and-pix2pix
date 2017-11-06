@@ -41,6 +41,8 @@ class GlassesModel(CycleGANModel):
         lambda_idt = self.opt.identity
         lambda_A = self.opt.lambda_A
         lambda_B = self.opt.lambda_B
+        lambda_MA = self.opt.lambda_MA
+        lambda_MB = self.opt.lambda_MB
         # Identity loss
         if lambda_idt > 0:
             # G_A should be identity if real_B is fed.
@@ -73,15 +75,27 @@ class GlassesModel(CycleGANModel):
         self.loss_cycle_B = self.criterionCycle(self.rec_B, self.real_B) * lambda_B
 
         # Mask loss A
-        real_A = torch.max(self.input_A, self.mask_A)
-        fake_B = torch.max(self.fake_B.detach(), self.vmask_A)
-        self.loss_mask_A = self.criterionMask(real_A, fake_B) * lambda_A
+        self.masked_real_A = torch.max(self.input_A, self.mask_A)
+        self.masked_fake_B = torch.max(self.fake_B.detach(), self.vmask_A)
+        self.loss_mask_A = self.criterionMask(self.masked_real_A, self.masked_fake_B) * lambda_MA
 
         # Mask loss B
-        real_B = torch.max(self.input_B, self.mask_B)
-        fake_A = torch.max(self.fake_A.detach(), self.vmask_B)
-        self.loss_mask_B = self.criterionMask(real_B, fake_A) * lambda_B
+        self.masked_real_B = torch.max(self.input_B, self.mask_B)
+        self.masked_fake_A = torch.max(self.fake_A.detach(), self.vmask_B)
+        self.loss_mask_B = self.criterionMask(self.masked_real_B, self.masked_fake_A) * lambda_MB
 
         # combined loss
         self.loss_G = self.loss_G_A + self.loss_G_B + self.loss_cycle_A + self.loss_cycle_B + self.loss_mask_A + self.loss_mask_B + self.loss_idt_A + self.loss_idt_B
         self.loss_G.backward()
+
+    def get_current_errors(self):
+        errors = CycleGANModel.get_current_errors(self)
+        errors['M_A'] = self.loss_mask_A.data[0]
+        errors['M_B'] = self.loss_mask_B.data[0]
+
+    def get_current_visuals(self):
+        visuals = CycleGANModel.get_current_visuals(self)
+        visuals['masked_real_A'] = self.masked_real_A
+        visuals['masked_fake_B'] = self.masked_fake_B
+        visuals['masked_real_B'] = self.masked_real_B
+        visuals['masked_fake_A'] = self.masked_fake_A
