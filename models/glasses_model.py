@@ -3,6 +3,7 @@ from torchvision.transforms import ToPILImage, ToTensor
 from torch.autograd import Variable
 from PIL import Image
 import torch
+import util.util as util
 
 class GlassesModel(CycleGANModel):
     def name(self):
@@ -96,8 +97,8 @@ class GlassesModel(CycleGANModel):
 
     def get_current_visuals(self):
         visuals = CycleGANModel.get_current_visuals(self)
-        visuals['masked_real_A'] = self.masked_real_A
-        visuals['masked_fake_B'] = self.masked_fake_B
-        visuals['masked_real_B'] = self.masked_real_B
-        visuals['masked_fake_A'] = self.masked_fake_A
+        visuals['masked_real_A'] = util.tensor2im(self.masked_real_A)
+        visuals['masked_fake_B'] = util.tensor2im(self.masked_fake_B)
+        visuals['masked_real_B'] = util.tensor2im(self.masked_real_B)
+        visuals['masked_fake_A'] = util.tensor2im(self.masked_fake_A)
         return visuals
