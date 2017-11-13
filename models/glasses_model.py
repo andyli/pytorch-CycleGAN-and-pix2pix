@@ -97,8 +97,9 @@ class GlassesModel(CycleGANModel):
 
     def get_current_visuals(self):
         visuals = CycleGANModel.get_current_visuals(self)
-        visuals['masked_real_A'] = util.tensor2im(self.masked_real_A)
-        visuals['masked_fake_B'] = util.tensor2im(self.masked_fake_B.data)
-        visuals['masked_real_B'] = util.tensor2im(self.masked_real_B)
-        visuals['masked_fake_A'] = util.tensor2im(self.masked_fake_A.data)
+        if self.isTrain:
+            visuals['masked_real_A'] = util.tensor2im(self.masked_real_A)
+            visuals['masked_fake_B'] = util.tensor2im(self.masked_fake_B.data)
+            visuals['masked_real_B'] = util.tensor2im(self.masked_real_B)
+            visuals['masked_fake_A'] = util.tensor2im(self.masked_fake_A.data)
         return visuals
