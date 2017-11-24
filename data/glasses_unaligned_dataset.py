@@ -23,7 +23,8 @@ class GlassesUnalignedDataset(BaseDataset):
         self.B_size = len(self.B_paths)
         self.transform = get_transform(opt)
 
-        self.read_landmarks()
+        if self.opt.phase == "train":
+            self.read_landmarks()
 
     def read_landmarks(self):
         list_landmarks_align_celeba = "/media/andy/Data/Downloads/celeba/Anno/list_landmarks_align_celeba.txt"
@@ -72,18 +73,23 @@ class GlassesUnalignedDataset(BaseDataset):
         A_img = Image.open(A_path).convert('RGB')
         B_img = Image.open(B_path).convert('RGB')
 
-        A_eyemask = self.eyemask_of_im(os.path.basename(A_path), A_img)
-        B_eyemask = self.eyemask_of_im(os.path.basename(B_path), B_img)
+        if self.opt.phase == "train":
+            A_eyemask = self.eyemask_of_im(os.path.basename(A_path), A_img)
+            B_eyemask = self.eyemask_of_im(os.path.basename(B_path), B_img)
 
         A_img = self.transform(A_img)
         B_img = self.transform(B_img)
-        A_eyemask = self.transform(A_eyemask)
-        B_eyemask = self.transform(B_eyemask)
+        if self.opt.phase == "train":
+            A_eyemask = self.transform(A_eyemask)
+            B_eyemask = self.transform(B_eyemask)
 
-
-        return {'A': A_img, 'B': B_img,
-                'A_eyemask': A_eyemask, 'B_eyemask': B_eyemask,
-                'A_paths': A_path, 'B_paths': B_path}
+        if self.opt.phase == "train":
+            return {'A': A_img, 'B': B_img,
+                    'A_eyemask': A_eyemask, 'B_eyemask': B_eyemask,
+                    'A_paths': A_path, 'B_paths': B_path}
+        else:
+            return {'A': A_img, 'B': B_img,
+                    'A_paths': A_path, 'B_paths': B_path}
 
     def __len__(self):
         return max(self.A_size, self.B_size)

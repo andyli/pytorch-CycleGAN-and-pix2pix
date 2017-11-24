@@ -23,20 +23,22 @@ class GlassesModel(CycleGANModel):
     def set_input(self, input):
         CycleGANModel.set_input(self, input)
 
-        AtoB = self.opt.which_direction == 'AtoB'
-        input_mask_A = input['A_eyemask' if AtoB else 'B_eyemask']
-        input_mask_B = input['B_eyemask' if AtoB else 'A_eyemask']
-        self.input_mask_A.resize_(input_mask_A.size()).copy_(input_mask_A)
-        self.input_mask_B.resize_(input_mask_B.size()).copy_(input_mask_B)
+        if self.isTrain:
+            AtoB = self.opt.which_direction == 'AtoB'
+            input_mask_A = input['A_eyemask' if AtoB else 'B_eyemask']
+            input_mask_B = input['B_eyemask' if AtoB else 'A_eyemask']
+            self.input_mask_A.resize_(input_mask_A.size()).copy_(input_mask_A)
+            self.input_mask_B.resize_(input_mask_B.size()).copy_(input_mask_B)
 
     def forward(self):
         CycleGANModel.forward(self)
 
-        self.mask_A = self.input_mask_A
-        self.mask_B = self.input_mask_B
+        if self.isTrain:
+            self.mask_A = self.input_mask_A
+            self.mask_B = self.input_mask_B
 
-        self.vmask_A = Variable(self.input_mask_A)
-        self.vmask_B = Variable(self.input_mask_B)
+            self.vmask_A = Variable(self.input_mask_A)
+            self.vmask_B = Variable(self.input_mask_B)
 
     def backward_G(self):
         lambda_idt = self.opt.identity
