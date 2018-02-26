@@ -16,6 +16,9 @@ def CreateDataset(opt):
     elif opt.dataset_mode == 'glasses':
         from data.glasses_unaligned_dataset import GlassesUnalignedDataset
         dataset = GlassesUnalignedDataset()
+    elif opt.dataset_mode == 'tclfaces':
+        from data.tclfaces_dataset import TCLFacesDataset
+        dataset = TCLFacesDataset()
     else:
         raise ValueError("Dataset [%s] not recognized." % opt.dataset_mode)
 

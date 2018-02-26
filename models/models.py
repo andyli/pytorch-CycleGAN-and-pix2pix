@@ -11,7 +11,7 @@ def create_model(opt):
         from .pix2pix_model import Pix2PixModel
         model = Pix2PixModel()
     elif opt.model == 'glasses':
-        assert(opt.dataset_mode == 'glasses')
+        # assert(opt.dataset_mode == 'glasses')
         from .glasses_model import GlassesModel
         model = GlassesModel()
     elif opt.model == 'test':
